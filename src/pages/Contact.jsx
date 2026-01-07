@@ -100,7 +100,7 @@ function Contact() {
                     href="tel:+1234567890"
                     className="text-gray-600 hover:text-primary transition-colors"
                   >
-                    (123) 456-7890
+                    (678) 849-4592
                   </a>
                   <p className="text-sm text-gray-500 mt-1">Monday - Friday, 8:00 AM - 5:00 PM</p>
                 </div>

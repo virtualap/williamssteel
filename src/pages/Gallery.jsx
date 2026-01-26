@@ -1,49 +1,71 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function Gallery() {
-  // Placeholder images - the client will provide actual project photos
+  // Project gallery images - professional stock photos
   const galleryImages = [
     {
       id: 1,
       title: 'Industrial Steel Fabrication',
       category: 'Industrial',
-      description: 'Custom steel fabrication for industrial facility',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Industrial+Project+1',
+      description: 'Custom steel fabrication and beam assembly for industrial manufacturing facility',
+      image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebb6122?w=800&h=600&fit=crop',
     },
     {
       id: 2,
       title: 'Commercial Building Framework',
       category: 'Commercial',
-      description: 'Structural steel installation for commercial building',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Commercial+Project+1',
+      description: 'Structural steel framework installation for multi-story commercial building',
+      image: 'https://images.unsplash.com/photo-1590644365607-1c5a8235a5a0?w=800&h=600&fit=crop',
     },
     {
       id: 3,
-      title: 'Welding Services',
+      title: 'Precision Welding',
       category: 'Industrial',
-      description: 'Professional welding on industrial project',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Welding+Project+1',
+      description: 'Professional MIG welding services for heavy-duty industrial applications',
+      image: 'https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?w=800&h=600&fit=crop',
     },
     {
       id: 4,
-      title: 'Residential Steel Work',
-      category: 'Residential',
-      description: 'Custom steel components for residential project',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Residential+Project+1',
+      title: 'Structural Steel Installation',
+      category: 'Commercial',
+      description: 'Large-scale structural steel erection for commercial development project',
+      image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&h=600&fit=crop',
     },
     {
       id: 5,
-      title: 'Government Facility',
-      category: 'Government',
-      description: 'Steel construction for government building',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Government+Project+1',
+      title: 'Residential Steel Framing',
+      category: 'Residential',
+      description: 'Custom steel framing and support structures for modern residential construction',
+      image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop',
     },
     {
       id: 6,
-      title: 'Metal Fabrication',
+      title: 'Government Infrastructure',
+      category: 'Government',
+      description: 'Steel construction and fabrication for public infrastructure project',
+      image: 'https://images.unsplash.com/photo-1587582423116-ec07293f0395?w=800&h=600&fit=crop',
+    },
+    {
+      id: 7,
+      title: 'Metal Fabrication Workshop',
+      category: 'Industrial',
+      description: 'Precision metal cutting and fabrication in our professional workshop',
+      image: 'https://images.unsplash.com/photo-1567361808960-dec9cb578182?w=800&h=600&fit=crop',
+    },
+    {
+      id: 8,
+      title: 'Steel Beam Assembly',
       category: 'Commercial',
-      description: 'Custom metal fabrication work',
-      image: 'https://via.placeholder.com/600x400/DC2626/FFFFFF?text=Fabrication+Project+1',
+      description: 'Heavy steel beam installation for warehouse and distribution center',
+      image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop',
+    },
+    {
+      id: 9,
+      title: 'TIG Welding Services',
+      category: 'Industrial',
+      description: 'High-precision TIG welding for specialized industrial components',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
     },
   ]
 
@@ -176,18 +198,16 @@ function Gallery() {
         </div>
       )}
 
-      {/* Note Section */}
-      <section className="bg-gray-50 py-16">
+      {/* CTA Section */}
+      <section className="bg-primary text-white py-16">
         <div className="section-container max-w-4xl mx-auto text-center">
-          <h2 className="section-title mb-4">Your Project Could Be Next</h2>
-          <p className="text-lg text-gray-700 mb-8">
-            These images are placeholders. We'll showcase your actual completed projects once you provide
-            high-quality photos of your best work. Quality project photography helps demonstrate your
-            capabilities to potential clients.
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Your Project Could Be Next</h2>
+          <p className="text-xl mb-8">
+            Ready to start your steel construction project? Contact us today for a free consultation and quote.
           </p>
-          <p className="text-gray-600 italic">
-            Note: Replace placeholder images with actual project photos for the final website.
-          </p>
+          <Link to="/contact" className="btn-secondary inline-block">
+            Request a Quote
+          </Link>
         </div>
       </section>
     </div>

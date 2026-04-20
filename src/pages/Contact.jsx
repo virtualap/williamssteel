@@ -120,10 +120,10 @@ function Contact() {
                 <div>
                   <h3 className="font-bold text-secondary mb-1">Email</h3>
                   <a
-                    href="mailto:info@williamssteelworks.com"
+                    href="mailto:info@williamssteelworks.net"
                     className="text-gray-600 hover:text-primary transition-colors"
                   >
-                    info@williamssteelworks.com
+                    info@williamssteelworks.net
                   </a>
                   <p className="text-sm text-gray-500 mt-1">We'll respond within 24 hours</p>
                 </div>

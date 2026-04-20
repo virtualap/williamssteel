@@ -191,7 +191,7 @@ function Contact() {
             )}
 
             {/* Netlify Form - Hidden for bot detection */}
-            <form name="contact-quote" netlify="true" netlify-honeypot="bot-field" hidden>
+            <form name="contact-quote" data-netlify="true" netlify-honeypot="bot-field" hidden>
               <input type="text" name="name" />
               <input type="email" name="email" />
               <input type="tel" name="phone" />

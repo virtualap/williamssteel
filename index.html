@@ -10,6 +10,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Hidden form for Netlify form detection -->
+    <form name="contact-quote" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <input type="text" name="company" />
+      <select name="projectType"><option value="">Select...</option></select>
+      <textarea name="message"></textarea>
+      <input type="file" name="file" multiple />
+    </form>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

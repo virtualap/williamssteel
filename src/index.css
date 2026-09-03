@@ -3,29 +3,75 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --weld: #e4512b;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-white text-secondary;
+    @apply bg-paper font-sans text-ink antialiased;
+    font-feature-settings: "kern", "liga", "calt";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Single, background-agnostic focus treatment (weld reads on paper and on blueprint). */
+  *:focus-visible {
+    outline: 2px solid var(--weld);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--weld);
+    color: #f4f1ea;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300;
+  /* Faint engineering grid for dark sections — replaces the generic hero gradient. */
+  .blueprint-grid {
+    background-color: theme("colors.blueprint.DEFAULT");
+    background-image: linear-gradient(
+        rgba(244, 241, 234, 0.055) 1px,
+        transparent 1px
+      ),
+      linear-gradient(90deg, rgba(244, 241, 234, 0.055) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: -1px -1px;
   }
 
-  .btn-secondary {
-    @apply bg-secondary hover:bg-secondary-light text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300;
+  /* Cut-plate corner — one signature detail, used sparingly on featured panels. */
+  .edge-clip {
+    clip-path: polygon(
+      0 0,
+      calc(100% - 16px) 0,
+      100% 16px,
+      100% 100%,
+      0 100%
+    );
   }
 
-  .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16;
-  }
-
-  .section-title {
-    @apply text-3xl md:text-4xl font-bold text-secondary mb-6;
-  }
-
-  .card {
-    @apply bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300;
+  /* Caution-tape divider. */
+  .hazard-rule {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      theme("colors.ink.DEFAULT") 0 12px,
+      transparent 12px 24px
+    );
   }
 }

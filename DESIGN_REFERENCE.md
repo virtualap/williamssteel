@@ -1,329 +1,123 @@
-# Design Reference - Williams Steel Works Website
-
-## Color Palette
-
-### Primary Colors
-
-**Red (Primary Brand Color)**
-- Default: `#DC2626` (Red-600) - Main buttons, accents, icons
-- Dark: `#991B1B` (Red-800) - Hover states, emphasis
-- Light: `#EF4444` (Red-500) - Lighter accents
-
-**Dark/Black (Secondary Color)**
-- Default: `#1F2937` (Gray-800) - Header, footer, dark backgrounds
-- Darker: `#111827` (Gray-900) - Footer, deep sections
-- Lighter: `#374151` (Gray-700) - Hover states
-
-### Supporting Colors
-
-**Backgrounds**
-- White: `#FFFFFF` - Main content areas
-- Light Gray: `#F9FAFB` (Gray-50) - Alternate sections
-- Medium Gray: `#E5E7EB` (Gray-200) - Borders, dividers
-
-**Text Colors**
-- Primary Text: `#1F2937` (Gray-800) - Headings, important text
-- Secondary Text: `#4B5563` (Gray-600) - Body text
-- Tertiary Text: `#6B7280` (Gray-500) - Captions, metadata
-- Light Text: `#9CA3AF` (Gray-400) - Disabled, placeholders
-
-## Typography
-
-### Font Family
-- **System Font Stack**:
-  - `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`
-  - Professional, fast loading, native appearance
-
-### Font Sizes
-- **Hero Title**: 3.75rem (60px) on desktop, 2.25rem (36px) on mobile
-- **Page Title (H1)**: 3rem (48px) on desktop, 2.25rem (36px) on mobile
-- **Section Title (H2)**: 2.25rem (36px) on desktop, 1.875rem (30px) on mobile
-- **Subsection (H3)**: 1.5rem (24px)
-- **Card Title**: 1.25rem (20px)
-- **Body Text**: 1rem (16px)
-- **Small Text**: 0.875rem (14px)
-
-### Font Weights
-- **Bold**: 700 - Headlines, important text
-- **Semibold**: 600 - Subheadings, buttons
-- **Medium**: 500 - Navigation
-- **Regular**: 400 - Body text
-
-## Layout Components
-
-### Container Widths
-- **Max Width**: 1280px (max-w-7xl)
-- **Padding**:
-  - Mobile: 1rem (16px)
-  - Tablet: 1.5rem (24px)
-  - Desktop: 2rem (32px)
-
-### Spacing System
-- **Section Padding**: 4rem (64px) vertical
-- **Card Padding**: 1.5rem (24px)
-- **Element Gaps**: 0.5rem, 1rem, 1.5rem, 2rem
-
-### Border Radius
-- **Buttons**: 0.5rem (8px)
-- **Cards**: 0.5rem (8px)
-- **Images**: 0.5rem (8px)
-- **Pills/Tags**: 9999px (fully rounded)
-
-## Components
-
-### Buttons
-
-**Primary Button** (`.btn-primary`)
-- Background: Red `#DC2626`
-- Hover: Dark Red `#991B1B`
-- Text: White
-- Padding: 0.75rem 1.5rem (12px 24px)
-- Border Radius: 0.5rem (8px)
-- Font Weight: 600 (Semibold)
-
-**Secondary Button** (`.btn-secondary`)
-- Background: Dark `#1F2937`
-- Hover: Lighter Dark `#374151`
-- Text: White
-- Same sizing as primary
-
-### Cards
-
-**Standard Card** (`.card`)
-- Background: White
-- Shadow: 0 10px 15px rgba(0,0,0,0.1)
-- Hover Shadow: 0 20px 25px rgba(0,0,0,0.15)
-- Border Radius: 0.5rem (8px)
-- Padding: 1.5rem (24px)
-- Transition: shadow 300ms
-
-### Navigation
-
-**Header**
-- Background: Dark `#1F2937`
-- Height: 5rem (80px)
-- Position: Sticky top
-- Shadow: 0 2px 4px rgba(0,0,0,0.1)
-
-**Navigation Links**
-- Default: White
-- Hover: Red `#DC2626`
-- Active: Red `#DC2626`
-- Transition: color 300ms
-
-**Mobile Menu**
-- Hamburger icon: 1.5rem (24px)
-- Dropdown background: Dark `#1F2937`
-- Appears below 768px width
-
-### Footer
-
-- Background: Dark `#1F2937`
-- Text: White / Gray-300
-- Links Hover: Red `#DC2626`
-- Three-column grid on desktop
-- Stacked on mobile
-
-## Page Sections
-
-### Hero Section
-- Background: Gradient from `#1F2937` to `#111827`
-- Text: White
-- Padding: 5rem vertical (80px)
-- Center aligned
-
-### Content Sections
-- Alternating white and gray-50 backgrounds
-- Padding: 4rem vertical (64px)
-- Max width: 1280px centered
-
-### Form Sections
-- White background card
-- Input borders: Gray-300
-- Focus state: Red-600 ring
-- Error state: Red-500 border
-
-## Icons
-
-### Icon Style
-- SVG icons from Heroicons (outline style)
-- Size: 1.5rem (24px) for UI elements
-- Size: 4rem (64px) for feature icons
-- Color: Red `#DC2626` for primary icons
-- Color: Gray-600 for secondary icons
-
-### Common Icons Used
-- Phone: Contact information
-- Email: Contact information
-- Lightning: Welding services
-- Building: Installation services
-- Cog/Tool: Fabrication services
-- Check Circle: Feature lists, completed items
-- Search: Gallery zoom
-- Close: Modal dismiss
-
-## Responsive Breakpoints
-
-### Tailwind Breakpoints
-- **sm**: 640px - Small tablets
-- **md**: 768px - Tablets
-- **lg**: 1024px - Laptops
-- **xl**: 1280px - Desktops
-- **2xl**: 1536px - Large desktops
-
-### Layout Changes
-- **Mobile** (< 768px):
-  - Single column layouts
-  - Hamburger menu
-  - Stacked cards
-  - Full-width buttons
-
-- **Tablet** (768px - 1024px):
-  - Two-column grids
-  - Visible navigation
-  - Side-by-side content
-
-- **Desktop** (> 1024px):
-  - Three-column grids
-  - Full navigation bar
-  - Optimized spacing
-
-## Animations & Transitions
-
-### Hover Effects
-- Buttons: Background color change (300ms)
-- Links: Color change (300ms)
-- Cards: Shadow expansion (300ms)
-- Images: Scale 1.1 (300ms)
-
-### Page Transitions
-- Smooth scrolling enabled
-- No page load transitions (SPA)
-
-### Form Interactions
-- Focus: Ring animation (instant)
-- Submit: Button disabled state
-- Success/Error: Fade in (200ms)
-
-## Imagery
-
-### Image Specifications
-- **Gallery Images**: Minimum 1200px wide, 800px tall
-- **Format**: JPG for photos, PNG for graphics
-- **Optimization**: Compress before upload
-- **Aspect Ratio**: 3:2 preferred for gallery
-
-### Placeholder Images
-- Current: via.placeholder.com with red background
-- Replace with actual project photos
-- Categories: Industrial, Commercial, Residential, Government
-
-## Accessibility
-
-### ARIA Labels
-- Navigation toggle: "Toggle menu"
-- Close buttons: "Close"
-- Form fields: Proper labels
-
-### Contrast Ratios
-- All text meets WCAG AA standards
-- Red on white: 4.5:1+ ✅
-- White on dark: 15:1+ ✅
-
-### Keyboard Navigation
-- All interactive elements focusable
-- Visible focus states (red ring)
-- Skip links available
-
-## Browser Compatibility
-
-### Supported
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-### Features Used
-- CSS Grid
-- Flexbox
-- CSS Custom Properties (via Tailwind)
-- ES6+ JavaScript (transpiled by Vite)
-
-## Performance Targets
-
-### Metrics
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Time to Interactive**: < 3.5s
-- **Cumulative Layout Shift**: < 0.1
-
-### Optimization
-- Code splitting by route
-- Lazy loading images
-- Minified CSS/JS
-- Compressed assets (gzip)
-
-## Design Principles
-
-1. **Professional**: Clean, modern, business-focused design
-2. **Bold**: Strong use of red accent color
-3. **Clear**: Easy navigation and information hierarchy
-4. **Responsive**: Mobile-first approach
-5. **Fast**: Optimized for quick loading
-6. **Accessible**: WCAG compliant
-
-## Usage Examples
-
-### CSS Classes
-
-```jsx
-// Primary button
-<button className="btn-primary">Request Quote</button>
-
-// Secondary button
-<button className="btn-secondary">Learn More</button>
-
-// Card
-<div className="card">
-  <h3>Title</h3>
-  <p>Content</p>
-</div>
-
-// Section container
-<section className="section-container">
-  <h2 className="section-title">Section Title</h2>
-  <p>Content...</p>
-</section>
-```
-
-### Color Usage
-
-```jsx
-// Text colors
-<h1 className="text-secondary">Heading</h1>
-<p className="text-gray-700">Body text</p>
-<span className="text-primary">Accent text</span>
-
-// Background colors
-<div className="bg-primary">Red background</div>
-<div className="bg-secondary">Dark background</div>
-<div className="bg-gray-50">Light background</div>
-```
-
-## Brand Guidelines
-
-### Voice & Tone
-- **Professional**: Industry expertise
-- **Confident**: Capable and reliable
-- **Direct**: Clear communication
-- **Helpful**: Customer-focused
-
-### Messaging
-- Emphasize comprehensive solutions
-- Highlight experience with all project types
-- Focus on quality and safety
-- Target professional contractors
+# Design Reference — Williams Steel Works
+
+**Identity: "Structural / Fab Shop."** Warm paper ground, drafting-ink dark sections, a
+torch/weld orange accent, cool steel-grey neutrals. Square corners, 2px hard borders
+instead of soft shadows, a faint engineering grid on dark sections, numbered section
+headers, and one cut-plate corner detail. Sentence case for headings; UPPERCASE +
+tracking reserved for mono labels, eyebrows, and buttons.
+
+All tokens live in `tailwind.config.js`. Primitives live in `src/components/ui/`.
+Global base + the three helper classes live in `src/index.css`.
 
 ---
 
-**For questions about design implementation, see the actual component files in `/src`**
+## Colour (`tailwind.config.js` → `theme.extend.colors`)
+
+| Token | Hex | Use |
+|---|---|---|
+| `paper` | `#F4F1EA` | default page background |
+| `paper-dim` | `#E9E4D8` | alternate / recessed sections |
+| `ink` | `#16181D` | body text, hard borders, dark bands |
+| `ink-soft` | `#33373F` | secondary body text on paper |
+| `weld` | `#E4512B` | primary accent — CTAs, keylines, active nav, focus ring |
+| `weld-dark` | `#C13F1E` | hover / pressed |
+| `weld-light` | `#F0703F` | — reserved |
+| `blueprint` | `#17313D` | dark section background (with grid) |
+| `blueprint-dark` | `#0F232C` | — reserved |
+| `steel-100…700` | `#E4E1DA → #343430` | borders (200), placeholder (400), muted text (500), on-dark text (200) |
+| `success` / `warning` / `danger` | `#3F7D4E` / `#C98A1E` / `#C43B2B` | each has `.DEFAULT`, `.surface`, `.border`. Kept separate from `weld`. |
+
+There is no separate "brand red" and "error red" collision any more: brand = `weld`,
+errors = `danger`.
+
+## Typography
+
+Loaded via Google Fonts in `index.html`.
+
+| Family | Token | Role |
+|---|---|---|
+| **Archivo** (400–900) | `font-display` | headings — `font-black` for H1/hero, `font-extrabold` for H2/H3 |
+| **IBM Plex Sans** (400–700) | `font-sans` | body copy (default on `<body>`) |
+| **IBM Plex Mono** (400–600) | `font-mono` | eyebrows, labels, buttons, spec lines, metadata |
+
+- Display headings use `tracking-tightest` (`-0.045em`).
+- Mono labels use `tracking-eyebrow` (`0.22em`) or `tracking-label` (`0.14em`), always `uppercase`.
+- Heading sizes are set by `<SectionHeading>` / `<PageHero>` — don't hand-size H2s.
+
+## Spacing & layout
+
+- `<Container>` — `max-w-7xl` + `px-5 sm:px-8 lg:px-12`. Width/gutters only.
+- `<Section>` — vertical rhythm (`py-16 md:py-24`) + a `tone` (`paper` | `dim` | `dark` | `weld`). Wraps children in a Container.
+- Custom scale: `spacing.section` = 6rem, `spacing.section-lg` = 8rem. `maxWidth.prose` = 68ch.
+- Header/Footer use `<Container>` directly (no section padding leaks in).
+
+## Shape & elevation
+
+- `borderRadius` is reset: default **0**, `sm`/`edge` = 2px, `full` for pills. The system is square.
+- No blurred shadows. `boxShadow.hard` = `5px 5px 0 0 #16181D` (offset plate lift), `hard-sm`, `hard-weld`.
+- `.edge-clip` (in `index.css`) cuts a 16px corner off the top-right — used on featured panels only.
+- `.blueprint-grid` — `blueprint` bg + 30px engineering grid. Used by `<PageHero>` and `<Section tone="dark">`.
+- `.hazard-rule` — caution-tape divider (`<HazardRule>`), one per page maximum.
+
+## Focus & motion
+
+- Single global treatment: `*:focus-visible { outline: 2px solid weld; outline-offset: 2px }` — works on light and dark.
+- Transitions: `duration-200` + `ease-snap` (`cubic-bezier(0.2,0.8,0.2,1)`). Interactive cards shift `-translate-x/y-1` into a `shadow-hard`.
+
+---
+
+## Components (`src/components/ui/`, re-exported from `ui/index.js`)
+
+| Component | Notes |
+|---|---|
+| `Container` | width + gutters |
+| `Section` | `tone`, `container`, `containerClassName` |
+| `Eyebrow` | mono kicker; `index` prop → `01 — `; `tone` `weld` \| `muted` \| `onDark` |
+| `SectionHeading` | `index`, `eyebrow`, `title`, `intro`, `align`, `tone` (`light` \| `dark`) |
+| `PageHero` | inner-page hero on the blueprint grid; `index`, `eyebrow`, `title`, `spec`, `subtitle`, children |
+| `Button` | `variant` `primary` \| `outline` \| `onDark` \| `solidLight`; `size` `sm` \| `md` \| `lg`; `as` (e.g. `Link`); `withArrow` |
+| `Card` | `interactive`, `accent` (weld top keyline), `clip` (cut corner), `padding` `none` \| `md` \| `lg`, `as` |
+| `CTASection` | the one recurring end-of-page CTA (ink band, weld eyebrow, light button) |
+| `SpecList` | feature list; marker is a bracketed weld square, not a check-circle; `columns`, `tone` |
+| `Stat` | spec-sheet figure on a weld tick; `value`, `unit`, `label`, `tone`. Use real facts only. |
+| `Icon` | one 24px stroke set; `name`, `strokeWidth`. Names: fabrication, welding, installation, arrowRight, check, menu, close, clock, phone, mail, document, search |
+| `Logo` | wordmark lockup; `tone` `ink` \| `paper`, `size` `sm` \| `md` |
+| `HazardRule` | diagonal-stripe divider |
+| `Field`, `Label`, `Input`, `Textarea`, `Select`, `FieldError` | form primitives. `Input/Textarea/Select` forward refs (react-hook-form `register` works). `invalid` prop drives the `danger` border. `Select` has a custom chevron (no `@tailwindcss/forms`). |
+
+### Usage example
+
+```jsx
+import { Section, SectionHeading, Card, Icon, Button } from '../components/ui'
+import { Link } from 'react-router-dom'
+
+<Section tone="dim">
+  <SectionHeading index="02" eyebrow="Services" title="What we offer" />
+  <div className="mt-12 grid gap-6 md:grid-cols-3">
+    <Card as={Link} to="/services" interactive accent className="flex flex-col">
+      <span className="mb-5 inline-flex h-14 w-14 items-center justify-center border-2 border-ink text-weld">
+        <Icon name="fabrication" className="h-7 w-7" />
+      </span>
+      <h3 className="font-display text-xl font-extrabold tracking-tightest text-ink">Metal Fabrication</h3>
+      <p className="mt-2 flex-grow text-ink-soft">Custom fabrication to spec.</p>
+      <span className="mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-label text-weld">
+        See services <Icon name="arrowRight" className="h-4 w-4" />
+      </span>
+    </Card>
+  </div>
+</Section>
+```
+
+## Accessibility
+
+- Skip link in `Layout.jsx` → `<main id="main-content">`.
+- Every icon-only control has an `aria-label`; nav items carry `aria-current="page"`.
+- Form fields: `<Label htmlFor>` bound, `aria-invalid` on error, mono error text via `<FieldError>`.
+- Gallery modal: `role="dialog"` + `aria-modal` + `aria-label`.
+- Focus ring is `weld` at 2px with 2px offset, on every interactive element.
+
+## Content notes
+
+- Phone: **(678) 849-4592** → `tel:+16788494592` (Header footer + Contact now match).
+- Email: **info@williamssteelworks.net** (Header footer + Contact now match).
+- `Stat` values are drawn from existing copy (3 services, 4 sectors, 24-hr response, MIG/TIG/Stick) — do not invent metrics or credentials.

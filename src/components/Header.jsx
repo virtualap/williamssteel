@@ -1,87 +1,93 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import Container from './ui/Container'
+import Logo from './ui/Logo'
+import Icon from './ui/Icon'
+import { cn } from '../lib/cn'
+
+const NAV = [
+  { path: '/', label: 'Home' },
+  { path: '/services', label: 'Services' },
+  { path: '/gallery', label: 'Gallery' },
+  { path: '/contact', label: 'Contact' },
+]
 
 function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const location = useLocation()
-
-  const navLinks = [
-    { path: '/', label: 'Home' },
-    { path: '/services', label: 'Services' },
-    { path: '/gallery', label: 'Gallery' },
-    { path: '/contact', label: 'Contact' },
-  ]
-
-  const isActive = (path) => location.pathname === path
+  const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  const isActive = (path) => pathname === path
 
   return (
-    <header className="bg-secondary text-white shadow-lg sticky top-0 z-50">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold">
-              <span className="text-primary">Williams</span> Steel Works
-            </div>
-          </Link>
+    <header className="sticky top-0 z-40 border-b-2 border-ink bg-paper">
+      <Container className="flex h-16 items-center justify-between md:h-20">
+        <Link
+          to="/"
+          aria-label="Williams Steel Works — home"
+          onClick={() => setOpen(false)}
+        >
+          <Logo />
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-lg font-medium hover:text-primary transition-colors duration-300 ${
-                  isActive(link.path) ? 'text-primary' : 'text-white'
-                }`}
-              >
-                {link.label}
-              </Link>
+        <nav className="hidden md:block" aria-label="Primary">
+          <ul className="flex items-center gap-8">
+            {NAV.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  aria-current={isActive(item.path) ? 'page' : undefined}
+                  className={cn(
+                    'inline-block border-b-2 py-1 font-mono text-xs uppercase tracking-label transition-colors duration-200',
+                    isActive(item.path)
+                      ? 'border-weld text-weld'
+                      : 'border-transparent text-ink hover:text-weld',
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
+        </nav>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden text-white focus:outline-none"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMenuOpen ? (
-                <path d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          className="-mr-2 inline-flex h-10 w-10 items-center justify-center text-ink md:hidden"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <Icon name={open ? 'close' : 'menu'} strokeWidth={2} />
+        </button>
+      </Container>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden pb-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`block py-2 text-lg font-medium hover:text-primary transition-colors duration-300 ${
-                  isActive(link.path) ? 'text-primary' : 'text-white'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
+      {open && (
+        <nav className="border-t-2 border-ink bg-paper md:hidden" aria-label="Primary">
+          <ul className="flex flex-col">
+            {NAV.map((item) => (
+              <li key={item.path} className="border-b border-steel-200 last:border-0">
+                <Link
+                  to={item.path}
+                  onClick={() => setOpen(false)}
+                  aria-current={isActive(item.path) ? 'page' : undefined}
+                  className={cn(
+                    'flex items-center gap-3 px-5 py-4 font-mono text-sm uppercase tracking-label',
+                    isActive(item.path) ? 'text-weld' : 'text-ink',
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'h-2 w-2',
+                      isActive(item.path) ? 'bg-weld' : 'bg-steel-300',
+                    )}
+                  />
+                  {item.label}
+                </Link>
+              </li>
             ))}
-          </div>
-        )}
-      </nav>
+          </ul>
+        </nav>
+      )}
     </header>
   )
 }

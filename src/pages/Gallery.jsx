@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Card, CTASection, Icon, PageHero, Section } from '../components/ui'
 import { cn } from '../lib/cn'
 
-// Project gallery images - professional stock photos
+// Project gallery images — self-hosted from public/images/gallery/.
+// Provenance and licensing for every file: public/images/gallery/SOURCES.md
 const GALLERY_IMAGES = [
   {
     id: 1,
@@ -10,8 +11,7 @@ const GALLERY_IMAGES = [
     category: 'Industrial',
     description:
       'Custom steel fabrication and beam assembly for industrial manufacturing facility',
-    image:
-      'https://images.unsplash.com/photo-1504917595217-d4dc5ebb6122?w=800&h=600&fit=crop',
+    image: '/images/gallery/industrial-steel-fabrication.jpg',
   },
   {
     id: 2,
@@ -19,8 +19,7 @@ const GALLERY_IMAGES = [
     category: 'Commercial',
     description:
       'Structural steel framework installation for multi-story commercial building',
-    image:
-      'https://images.unsplash.com/photo-1590644365607-1c5a8235a5a0?w=800&h=600&fit=crop',
+    image: '/images/gallery/commercial-building-framework.jpg',
   },
   {
     id: 3,
@@ -28,8 +27,7 @@ const GALLERY_IMAGES = [
     category: 'Industrial',
     description:
       'Professional MIG welding services for heavy-duty industrial applications',
-    image:
-      'https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?w=800&h=600&fit=crop',
+    image: '/images/gallery/precision-welding.jpg',
   },
   {
     id: 4,
@@ -37,8 +35,7 @@ const GALLERY_IMAGES = [
     category: 'Commercial',
     description:
       'Large-scale structural steel erection for commercial development project',
-    image:
-      'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&h=600&fit=crop',
+    image: '/images/gallery/structural-steel-installation.jpg',
   },
   {
     id: 5,
@@ -46,8 +43,7 @@ const GALLERY_IMAGES = [
     category: 'Residential',
     description:
       'Custom steel framing and support structures for modern residential construction',
-    image:
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop',
+    image: '/images/gallery/residential-steel-framing.jpg',
   },
   {
     id: 6,
@@ -55,8 +51,7 @@ const GALLERY_IMAGES = [
     category: 'Government',
     description:
       'Steel construction and fabrication for public infrastructure project',
-    image:
-      'https://images.unsplash.com/photo-1587582423116-ec07293f0395?w=800&h=600&fit=crop',
+    image: '/images/gallery/government-infrastructure.jpg',
   },
   {
     id: 7,
@@ -64,8 +59,7 @@ const GALLERY_IMAGES = [
     category: 'Industrial',
     description:
       'Precision metal cutting and fabrication in our professional workshop',
-    image:
-      'https://images.unsplash.com/photo-1567361808960-dec9cb578182?w=800&h=600&fit=crop',
+    image: '/images/gallery/metal-fabrication-workshop.jpg',
   },
   {
     id: 8,
@@ -73,8 +67,7 @@ const GALLERY_IMAGES = [
     category: 'Commercial',
     description:
       'Heavy steel beam installation for warehouse and distribution center',
-    image:
-      'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop',
+    image: '/images/gallery/steel-beam-assembly.jpg',
   },
   {
     id: 9,
@@ -82,10 +75,13 @@ const GALLERY_IMAGES = [
     category: 'Industrial',
     description:
       'High-precision TIG welding for specialized industrial components',
-    image:
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+    image: '/images/gallery/tig-welding-services.jpg',
   },
 ]
+
+// Intrinsic size of every self-hosted gallery asset (landscape 4:3).
+const IMG_W = 1000
+const IMG_H = 750
 
 const CATEGORIES = ['All', 'Industrial', 'Commercial', 'Residential', 'Government']
 
@@ -147,12 +143,15 @@ function Gallery() {
               onClick={() => setSelectedImage(image)}
               className="group w-full text-left"
             >
-              <div className="relative overflow-hidden border-b-2 border-ink">
+              {/* Fixed 4:3 box keeps every card the same height before the image loads */}
+              <div className="relative aspect-[4/3] overflow-hidden border-b-2 border-ink">
                 <img
                   src={image.image}
                   alt={image.title}
+                  width={IMG_W}
+                  height={IMG_H}
                   loading="lazy"
-                  className="h-60 w-full object-cover grayscale-[35%] transition duration-300 ease-snap group-hover:grayscale-0 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover grayscale-[35%] transition duration-300 ease-snap group-hover:grayscale-0 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-ink/0 transition-colors duration-300 group-hover:bg-ink/40">
                   <span className="flex h-11 w-11 items-center justify-center border-2 border-paper text-paper opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -205,6 +204,8 @@ function Gallery() {
               <img
                 src={selectedImage.image}
                 alt={selectedImage.title}
+                width={IMG_W}
+                height={IMG_H}
                 className="h-auto w-full object-cover"
               />
             </div>

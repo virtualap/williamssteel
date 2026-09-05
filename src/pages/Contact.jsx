@@ -216,6 +216,18 @@ function Contact() {
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
               <input type="hidden" name="form-name" value="contact-quote" />
 
+              <p style={{ display: 'none' }} aria-hidden="true">
+                <label>
+                  Don&rsquo;t fill this out if you&rsquo;re human:
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    {...register('bot-field')}
+                  />
+                </label>
+              </p>
+
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field>
                   <Label htmlFor="name" required>

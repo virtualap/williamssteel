@@ -19,6 +19,12 @@
     <div id="root"></div>
     <!-- Hidden form for Netlify form detection -->
     <form name="contact-quote" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <p style="display: none" aria-hidden="true">
+        <label
+          >Don&rsquo;t fill this out if you&rsquo;re human:
+          <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+        </label>
+      </p>
       <input type="text" name="name" />
       <input type="email" name="email" />
       <input type="tel" name="phone" />

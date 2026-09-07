@@ -36,6 +36,11 @@ const DEFAULT_LOG_LEVEL = 'info'
 // Non-secret. Never auto-applied to customer leads; used only by the controlled
 // test procedure and the native-workflow exclusion rule.
 const DEFAULT_TEST_TAG = 'test:do-not-contact'
+// Always resolves non-empty. The opportunity dedupe check requires a real
+// prefix so that an unrelated open opportunity in the pipeline can never
+// suppress a legitimate website-quote opportunity, even when the operator has
+// not set GHL_OPPORTUNITY_NAME_PREFIX in Netlify.
+const DEFAULT_OPPORTUNITY_NAME_PREFIX = 'Website Quote —'
 
 export const LOG_LEVELS = ['error', 'warn', 'info', 'debug']
 
@@ -76,7 +81,8 @@ export function buildConfig(env = {}) {
     apiBaseUrl: str(raw.GHL_API_BASE_URL) || DEFAULT_API_BASE_URL,
     apiVersion: str(raw.GHL_API_VERSION) || DEFAULT_API_VERSION,
     requestTimeoutMs,
-    opportunityNamePrefix: str(raw.GHL_OPPORTUNITY_NAME_PREFIX),
+    opportunityNamePrefix:
+      str(raw.GHL_OPPORTUNITY_NAME_PREFIX) || DEFAULT_OPPORTUNITY_NAME_PREFIX,
     logLevel,
   })
 }

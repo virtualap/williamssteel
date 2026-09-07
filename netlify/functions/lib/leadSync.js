@@ -63,16 +63,16 @@ export async function syncLead(eventData, { config, logger, client } = {}) {
 
     // Duplicate-safe policy, scoped to website-quote opportunities only. An
     // existing open opportunity suppresses creation ONLY when its name begins
-    // with the configured GHL_OPPORTUNITY_NAME_PREFIX (the search endpoint
-    // already scopes to this contact + pipeline + status=open). An unrelated
-    // open opportunity (different prefix) does not suppress creation.
+    // with the resolved GHL_OPPORTUNITY_NAME_PREFIX (the search endpoint already
+    // scopes to this contact + pipeline + status=open). config guarantees the
+    // prefix is a non-empty trimmed string, so there is no fallback that treats
+    // every open opportunity in the pipeline as a website-quote opportunity —
+    // an unrelated open deal never suppresses creation.
     const prefix = config.opportunityNamePrefix
     const openOpportunities = await ghl.searchOpenOpportunities(upsert.contactId)
-    const applicable = prefix
-      ? openOpportunities.filter(
-          (opp) => typeof opp?.name === 'string' && opp.name.startsWith(prefix),
-        )
-      : openOpportunities
+    const applicable = openOpportunities.filter(
+      (opp) => typeof opp?.name === 'string' && opp.name.startsWith(prefix),
+    )
     if (applicable.length > 0) {
       log.info({ event: 'lead_sync', step: 'opportunity', outcome: 'ok', action: 'reused-existing', openCount: openOpportunities.length, applicableCount: applicable.length })
       return {

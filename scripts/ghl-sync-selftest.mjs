@@ -61,6 +61,13 @@ const FULL_ENV = {
 }
 const FULL_CONFIG = buildConfig(FULL_ENV)
 
+// Same as FULL_ENV but with GHL_OPPORTUNITY_NAME_PREFIX absent, so the config
+// module's non-empty default ("Website Quote —") applies. Used to prove there
+// is no fallback-to-any-open-opportunity behavior.
+const { GHL_OPPORTUNITY_NAME_PREFIX: _prefixOmitted, ...ENV_NO_PREFIX } = FULL_ENV
+const DEFAULT_PREFIX_CONFIG = buildConfig(ENV_NO_PREFIX)
+const RESOLVED_DEFAULT_PREFIX = 'Website Quote —'
+
 function mockClient({ openOpportunities = [] } = {}) {
   const calls = {
     upsertContact: 0,
@@ -146,6 +153,14 @@ check('api version defaults to v3', buildConfig({}).apiVersion === 'v3')
 check('api base defaults to leadconnector', buildConfig({}).apiBaseUrl === 'https://services.leadconnectorhq.com')
 check('timeout falls back on garbage', buildConfig({ GHL_REQUEST_TIMEOUT_MS: 'abc' }).requestTimeoutMs === 10000)
 check('GHL_TEST_TAG default is test:do-not-contact', buildConfig({}).testTag === 'test:do-not-contact')
+check('unset GHL_OPPORTUNITY_NAME_PREFIX -> "Website Quote —"',
+  buildConfig({}).opportunityNamePrefix === RESOLVED_DEFAULT_PREFIX)
+check('empty GHL_OPPORTUNITY_NAME_PREFIX -> "Website Quote —"',
+  buildConfig({ GHL_OPPORTUNITY_NAME_PREFIX: '' }).opportunityNamePrefix === RESOLVED_DEFAULT_PREFIX)
+check('whitespace-only GHL_OPPORTUNITY_NAME_PREFIX -> "Website Quote —"',
+  buildConfig({ GHL_OPPORTUNITY_NAME_PREFIX: '   \t  ' }).opportunityNamePrefix === RESOLVED_DEFAULT_PREFIX)
+check('explicit GHL_OPPORTUNITY_NAME_PREFIX is trimmed and kept',
+  buildConfig({ GHL_OPPORTUNITY_NAME_PREFIX: '  Custom Prefix  ' }).opportunityNamePrefix === 'Custom Prefix')
 
 console.log('syncLead — no outbound on gate/config failure:')
 {
@@ -239,6 +254,41 @@ console.log('syncLead — website-quote opportunity scope:')
   )
   check('honeypot at sync layer -> skipped', r.outcome === 'skipped' && r.reason === 'honeypot')
   check('honeypot -> zero outbound calls', client.calls.upsertContact === 0)
+}
+
+console.log('syncLead — opportunity scope under the RESOLVED DEFAULT prefix (no env prefix set):')
+{
+  // No fallback: an unrelated open opportunity must not suppress creation even
+  // though the operator never set GHL_OPPORTUNITY_NAME_PREFIX.
+  const client = mockClient({
+    openOpportunities: [
+      { id: 'opp_UNRELATED', status: 'open', name: 'Trade show follow-up' },
+      { id: 'opp_OTHER', status: 'open', name: 'Maintenance retainer 2026' },
+    ],
+  })
+  const r = await syncLead(VALID_SUBMISSION, { config: DEFAULT_PREFIX_CONFIG, logger: SILENT, client })
+  check('default prefix + only unrelated open opps -> still created', r.opportunity === 'created')
+  check('default prefix + only unrelated open opps -> create called', client.calls.createOpportunity === 1)
+  check('no fallback-to-any-open-opportunity behavior remains',
+    r.opportunity !== 'existing' && client.calls.createOpportunity === 1)
+}
+{
+  // A genuine website-quote opportunity (name starts with the resolved default
+  // prefix) still suppresses a duplicate.
+  const client = mockClient({
+    openOpportunities: [
+      { id: 'opp_WQ', status: 'open', name: `${RESOLVED_DEFAULT_PREFIX} commercial — Jane Sample` },
+    ],
+  })
+  const r = await syncLead(VALID_SUBMISSION, { config: DEFAULT_PREFIX_CONFIG, logger: SILENT, client })
+  check('default prefix + matching prefixed open opp -> suppressed', r.opportunity === 'existing')
+  check('default prefix + matching prefixed open opp -> no create call', client.calls.createOpportunity === 0)
+}
+{
+  const client = mockClient()
+  const r = await syncLead(VALID_SUBMISSION, { config: DEFAULT_PREFIX_CONFIG, logger: SILENT, client })
+  check('default prefix -> created opportunity name starts with "Website Quote —"',
+    client.lastOpportunity.name.startsWith(RESOLVED_DEFAULT_PREFIX))
 }
 
 console.log(`\n${passed} passed, ${failed} failed`)

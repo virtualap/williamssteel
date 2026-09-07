@@ -62,7 +62,7 @@ template.
 | `GHL_API_BASE_URL` | no | `https://services.leadconnectorhq.com` | |
 | `GHL_API_VERSION` | no | `v3` | Sent as the `Version` header. |
 | `GHL_REQUEST_TIMEOUT_MS` | no | `10000` | Per-request timeout via `AbortController`. |
-| `GHL_OPPORTUNITY_NAME_PREFIX` | no | *(empty)* | Prefix for the opportunity name. |
+| `GHL_OPPORTUNITY_NAME_PREFIX` | no | `Website Quote —` | Prefix for the opportunity name **and** the string the dedupe check matches. Blank / whitespace-only resolves to the non-empty default. |
 | `LEAD_SYNC_LOG_LEVEL` | no | `info` | `error` \| `warn` \| `info` \| `debug`. |
 
 ### Enable / disable and fail-closed behavior
@@ -113,21 +113,27 @@ project-appropriate stable key). An existing opportunity suppresses creation
 
 1. it belongs to the configured pipeline (the search endpoint enforces this);
 2. its status is `open`;
-3. its `name` begins with the configured `GHL_OPPORTUNITY_NAME_PREFIX`.
+3. its `name` begins with the **resolved** `GHL_OPPORTUNITY_NAME_PREFIX`.
+
+`GHL_OPPORTUNITY_NAME_PREFIX` always resolves to a non-empty, trimmed string:
+the operator's value, or `Website Quote —` when the variable is missing, empty,
+or whitespace-only. There is **no fallback** that treats every open opportunity
+in the pipeline as a website-quote opportunity.
 
 > Search `open` opportunities for this contact in the configured pipeline
 > (`GET /opportunities/search?locationId=…&pipelineId=…&contactId=…&status=open`),
-> then keep only those whose `name` starts with `GHL_OPPORTUNITY_NAME_PREFIX`.
-> Create a new website-quote opportunity **only** when that filtered set is empty.
+> then keep only those whose `name` starts with the resolved prefix. Create a new
+> website-quote opportunity **only** when that filtered set is empty.
 
-An unrelated open opportunity for the same contact (e.g. `Trade show follow-up`)
-does **not** suppress creation of the website-quote opportunity.
+Because the prefix is always non-empty, an unrelated open opportunity for the
+same contact — a maintenance retainer, a trade-show follow-up, a different
+product line — never blocks a new website quote, even if the operator has not
+set `GHL_OPPORTUNITY_NAME_PREFIX` in Netlify. Website-quote opportunities are
+created by this function with the resolved prefix in their name, so they match;
+opportunities created by any other means do not.
 
 **Limits:**
 
-* For prefix scoping to be effective, set `GHL_OPPORTUNITY_NAME_PREFIX`. If it is
-  empty, every open opportunity in the pipeline counts as applicable (the pre-
-  correction behavior).
 * Two submissions within the same short window can both see "no applicable open
   opportunity" and both create one (race). Acceptable for v1 volume.
 * If a prior website-quote opportunity was moved to `won` / `lost` /
@@ -138,6 +144,9 @@ does **not** suppress creation of the website-quote opportunity.
 * No opportunity fields are updated on a repeat submission; the existing
   applicable opportunity is left as-is and only the contact is upserted +
   re-tagged.
+* If an operator sets a custom `GHL_OPPORTUNITY_NAME_PREFIX` after
+  website-quote opportunities were already created under the default, those
+  older opportunities stop matching and a new one may be created.
 
 ## API contracts used (current official HighLevel v3 docs)
 

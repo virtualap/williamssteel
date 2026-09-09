@@ -9,6 +9,29 @@ import { syncLead } from './lib/leadSync.js'
 
 export default {
   async formSubmitted(event) {
+    // TEMPORARY diagnostic — sanitized event-shape only, to confirm how
+    // FormSubmittedEvent identifies the source form. Logs key NAMES and typeof
+    // strings only: never a value, a stringified event, or a payload. Causes no
+    // outbound request. Remove once the form-identity contract is confirmed.
+    const sortedKeys = (value) =>
+      value && typeof value === 'object' && !Array.isArray(value)
+        ? Object.keys(value).sort()
+        : []
+    console.info(
+      JSON.stringify({
+        event: 'form_submitted_shape',
+        topLevelKeys: sortedKeys(event),
+        dataKeys: sortedKeys(event?.data),
+        formKeys: sortedKeys(event?.form),
+        submissionKeys: sortedKeys(event?.submission),
+        typeofForm: typeof event?.form,
+        typeofFormName: typeof event?.formName,
+        typeofName: typeof event?.name,
+        typeofSite: typeof event?.site,
+        typeofSubmission: typeof event?.submission,
+      }),
+    )
+
     const config = loadConfig()
     const logger = createLogger(config.logLevel)
 

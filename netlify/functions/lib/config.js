@@ -1,4 +1,5 @@
-// The ONLY module that reads process.env for the GoHighLevel lead sync.
+// The ONLY module that reads process.env for the GoHighLevel lead sync (and,
+// separately below, for the Netlify Forms webhook receiver).
 // Everything else receives an immutable config object built here.
 
 const KNOWN_KEYS = [
@@ -118,4 +119,13 @@ export function createLogger(level = DEFAULT_LOG_LEVEL) {
     info: (fields) => emit('info', fields),
     debug: (fields) => emit('debug', fields),
   }
+}
+
+// --- Netlify Forms webhook receiver -----------------------------------------
+// Independent of the GoHighLevel config above: reading this requires no GHL
+// configuration at all. Server-side only — the returned value must never be
+// logged, echoed in a response, or exposed to the browser (no VITE_ variable).
+export function loadWebhookSecret() {
+  const raw = process.env.NETLIFY_FORM_WEBHOOK_SECRET
+  return typeof raw === 'string' ? raw.trim() : ''
 }

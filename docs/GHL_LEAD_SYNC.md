@@ -3,6 +3,29 @@
 Server-only, event-driven sync from the verified Netlify `contact-quote` form to
 GoHighLevel (HighLevel) CRM. Version 1.
 
+## Phase note — delivery path change in progress
+
+Production diagnostics proved the site's `formSubmitted` **platform-event**
+subscription (`netlify/functions/form-submitted.js`) never invokes on this
+site — confirmed with both a real verified form submission and an isolated
+`deploySucceeded` probe on a throwaway branch, neither of which produced a log
+record. The delivery path is being replaced with a **Netlify Forms outgoing
+webhook** to an authenticated HTTP receiver,
+`netlify/functions/netlify-form-webhook.mjs`, instead of a platform-event
+subscription.
+
+This receiver must first be deployed with **GoHighLevel sync disabled**
+(`GHL_SYNC_ENABLED` absent/false, as always) so its sanitized
+`netlify_form_webhook_shape` log can be observed for one real Netlify Forms
+notification before any field mapping, contact upsert, tagging, or opportunity
+logic is wired to it. The existing `form_submitted_shape` diagnostic in
+`form-submitted.js` is left unchanged and in place until that observation is
+complete — it costs nothing to keep and remains a fallback data point. Once the
+notification shape is confirmed, a follow-up change will add the narrow
+form-identity guard and connect `leadMapper.js` / `leadSync.js` / `ghlClient.js`
+to the webhook receiver instead of the event function, with GHL sync still
+disabled until a separately approved smoke test.
+
 ## Data flow
 
 ```

@@ -28,6 +28,11 @@ function plainText(status, text) {
   })
 }
 
+// Fixed, safe rejection marker: event/outcome/reason only. No request data.
+function logRejected(reason) {
+  console.info(JSON.stringify({ event: 'netlify_form_webhook', outcome: 'rejected', reason }))
+}
+
 function noContent() {
   return new Response(null, { status: 204, headers: NO_STORE })
 }
@@ -81,17 +86,20 @@ export function parseJsonBody(text) {
 
 export default async (request) => {
   if (request.method !== 'POST') {
+    logRejected('method-not-allowed')
     return plainText(405, 'Method Not Allowed')
   }
 
   const configuredSecret = loadWebhookSecret()
   if (!configuredSecret) {
+    logRejected('secret-unconfigured')
     return plainText(503, 'Service Unavailable')
   }
 
   const url = new URL(request.url)
   const suppliedSecret = url.searchParams.get('secret') ?? ''
   if (!secretsMatch(suppliedSecret, configuredSecret)) {
+    logRejected('secret-mismatch')
     return plainText(401, 'Unauthorized')
   }
 
@@ -99,11 +107,13 @@ export default async (request) => {
   try {
     rawText = await request.text()
   } catch {
+    logRejected('invalid-json')
     return plainText(400, 'Bad Request')
   }
 
   const parsed = parseJsonBody(rawText)
   if (!parsed.ok) {
+    logRejected('invalid-json')
     return plainText(400, 'Bad Request')
   }
 

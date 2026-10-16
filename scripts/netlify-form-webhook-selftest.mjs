@@ -132,6 +132,32 @@ console.log('\nStatic source check — no sync path or network call is reachable
   for (const token of forbidden) {
     check(`code (excluding comments) does not reference "${token}"`, !code.includes(token))
   }
+  // Rejection diagnostics: fixed markers only, one per guard.
+  const reasons = ['method-not-allowed', 'secret-unconfigured', 'secret-mismatch', 'invalid-json']
+  for (const reason of reasons) {
+    check(`rejection reason "${reason}" is a fixed marker`,
+      code.includes(`logRejected('${reason}')`))
+  }
+  check('logRejected emits only event/outcome/reason',
+    code.includes("console.info(JSON.stringify({ event: 'netlify_form_webhook', outcome: 'rejected', reason }))"))
+  check('exactly one console.info in logRejected plus two success records',
+    (code.match(/console\.info\(/g) || []).length === 3)
+  check('rejection markers appear before their 405/503/401/400 responses',
+    /logRejected\('method-not-allowed'\)\s*return plainText\(405/.test(code) &&
+    /logRejected\('secret-unconfigured'\)\s*return plainText\(503/.test(code) &&
+    /logRejected\('secret-mismatch'\)\s*return plainText\(401/.test(code) &&
+    (code.match(/logRejected\('invalid-json'\)\s*return plainText\(400/g) || []).length === 2)
+  check('success marker remains accepted_sync_disabled',
+    code.includes("{ event: 'netlify_form_webhook', outcome: 'accepted_sync_disabled' }"))
+  check('shape marker event is preserved', code.includes("event: 'netlify_form_webhook_shape'"))
+  const consoleLines = code.split('\n').filter((l) => l.includes('console.'))
+  const unsafeLogTokens = ['request.url', 'request.headers', 'searchParams', 'suppliedSecret',
+    'configuredSecret', 'rawText', 'error', 'err.', 'stack', 'message']
+  for (const token of unsafeLogTokens) {
+    check(`no console call references "${token}"`, !consoleLines.some((l) => l.includes(token)))
+  }
+  check('body is only logged through the key-only buildShapeRecord',
+    consoleLines.filter((l) => l.includes('parsed')).every((l) => l.includes('buildShapeRecord(parsed.body)')))
   check('code imports only the webhook secret helper from lib/config.js',
     code.includes("import { loadWebhookSecret } from './lib/config.js'") &&
     !/from ['"]\.\/lib\/(leadSync|ghlClient|leadMapper)\.js['"]/.test(code))

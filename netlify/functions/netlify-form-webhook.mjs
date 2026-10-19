@@ -2,10 +2,9 @@
 // Netlify Forms outgoing-notification webhook. Bypasses the site's proven-
 // non-invoking formSubmitted platform-event path.
 //
-// This phase intentionally does nothing with the notification except log a
-// sanitized shape record. It never loads GoHighLevel config, never calls
-// leadSync, and never makes an outbound request — even if GHL environment
-// values happen to exist. GHL_SYNC_ENABLED is not read here at all.
+// Phase 2: after authentication, hands the submission's form fields to the
+// existing syncLead(), which is gated by GHL_SYNC_ENABLED (off by default) and
+// fails closed on missing config. This file makes no outbound request itself.
 //
 // No custom `path` is set below: per current Netlify Functions docs, setting
 // config.path REPLACES the default route, so leaving it unset is what keeps
@@ -13,7 +12,8 @@
 //   /.netlify/functions/netlify-form-webhook
 
 import { timingSafeEqual } from 'node:crypto'
-import { loadWebhookSecret } from './lib/config.js'
+import { loadWebhookSecret, loadConfig, createLogger } from './lib/config.js'
+import { syncLead } from './lib/leadSync.js'
 
 export const config = {
   method: ['POST'],
@@ -26,6 +26,11 @@ function plainText(status, text) {
     status,
     headers: { ...NO_STORE, 'Content-Type': 'text/plain' },
   })
+}
+
+// Fixed, safe rejection marker: event/outcome/reason only. No request data.
+function logRejected(reason) {
+  console.info(JSON.stringify({ event: 'netlify_form_webhook', outcome: 'rejected', reason }))
 }
 
 function noContent() {
@@ -79,19 +84,53 @@ export function parseJsonBody(text) {
   return { ok: true, body: parsed }
 }
 
+// Pure. The Netlify outgoing-webhook body is the submission object: `data`
+// holds the form fields, and the form identity is the top-level `form_name`
+// (the hidden `form-name` field is NOT present inside `data`). The mapper
+// identifies the form by `data['form-name']`, so it is supplied from
+// `form_name`. Falls back to a nested payload.data, then {}.
+export function extractFormData(body) {
+  const candidate = [body?.data, body?.payload?.data].find(
+    (value) => value && typeof value === 'object' && !Array.isArray(value),
+  )
+  const fields = { ...(candidate ?? {}) }
+  if (typeof body?.form_name === 'string') fields['form-name'] = body.form_name
+  return fields
+}
+
+// Runs the lead sync for an authenticated, parsed submission. Never throws and
+// never returns field values. syncLead itself exits with no outbound call
+// unless GHL_SYNC_ENABLED is exactly "true" and the required config is present.
+// `deps` lets the self-test inject fakes (no real config or network).
+export async function processSubmission(body, deps = {}) {
+  try {
+    const loadCfg = deps.loadConfig ?? loadConfig
+    const sync = deps.syncLead ?? syncLead
+    const config = loadCfg()
+    const logger = (deps.createLogger ?? createLogger)(config.logLevel)
+    const result = await sync(extractFormData(body), { config, logger })
+    return { outcome: result?.outcome ?? 'unknown', reason: result?.reason }
+  } catch {
+    return { outcome: 'error', reason: 'sync-threw' }
+  }
+}
+
 export default async (request) => {
   if (request.method !== 'POST') {
+    logRejected('method-not-allowed')
     return plainText(405, 'Method Not Allowed')
   }
 
   const configuredSecret = loadWebhookSecret()
   if (!configuredSecret) {
+    logRejected('secret-unconfigured')
     return plainText(503, 'Service Unavailable')
   }
 
   const url = new URL(request.url)
   const suppliedSecret = url.searchParams.get('secret') ?? ''
   if (!secretsMatch(suppliedSecret, configuredSecret)) {
+    logRejected('secret-mismatch')
     return plainText(401, 'Unauthorized')
   }
 
@@ -99,19 +138,31 @@ export default async (request) => {
   try {
     rawText = await request.text()
   } catch {
+    logRejected('invalid-json')
     return plainText(400, 'Bad Request')
   }
 
   const parsed = parseJsonBody(rawText)
   if (!parsed.ok) {
+    logRejected('invalid-json')
     return plainText(400, 'Bad Request')
   }
 
   // Sanitized shape only — never the parsed body itself, a header, or the
-  // secret. No GHL config load, no field mapping, no sync call, no outbound
-  // request happens in this phase.
+  // secret.
   console.info(JSON.stringify(buildShapeRecord(parsed.body)))
-  console.info(JSON.stringify({ event: 'netlify_form_webhook', outcome: 'accepted_sync_disabled' }))
 
+  const result = await processSubmission(parsed.body)
+  console.info(
+    JSON.stringify({
+      event: 'netlify_form_webhook',
+      outcome: 'accepted',
+      sync: result.outcome,
+      reason: result.reason ?? null,
+    }),
+  )
+
+  // Always 204 once authenticated: Netlify disables the notification after
+  // repeated 4xx/5xx, and the submission is already safe in Netlify Forms.
   return noContent()
 }

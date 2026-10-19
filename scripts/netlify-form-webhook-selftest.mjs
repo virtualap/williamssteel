@@ -15,6 +15,8 @@ import {
   buildShapeRecord,
   secretsMatch,
   parseJsonBody,
+  extractFormData,
+  processSubmission,
 } from '../netlify/functions/netlify-form-webhook.mjs'
 
 let passed = 0
@@ -128,7 +130,7 @@ console.log('\nStatic source check — no sync path or network call is reachable
   const code = source
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '')
-  const forbidden = ['leadSync', 'ghlClient', 'leadMapper', 'loadConfig', 'GHL_SYNC_ENABLED', 'fetch(']
+  const forbidden = ['ghlClient', 'leadMapper', 'GHL_SYNC_ENABLED', 'fetch(', 'process.env']
   for (const token of forbidden) {
     check(`code (excluding comments) does not reference "${token}"`, !code.includes(token))
   }
@@ -140,15 +142,18 @@ console.log('\nStatic source check — no sync path or network call is reachable
   }
   check('logRejected emits only event/outcome/reason',
     code.includes("console.info(JSON.stringify({ event: 'netlify_form_webhook', outcome: 'rejected', reason }))"))
-  check('exactly one console.info in logRejected plus two success records',
+  check('exactly one console.info in logRejected plus shape and accepted records',
     (code.match(/console\.info\(/g) || []).length === 3)
   check('rejection markers appear before their 405/503/401/400 responses',
     /logRejected\('method-not-allowed'\)\s*return plainText\(405/.test(code) &&
     /logRejected\('secret-unconfigured'\)\s*return plainText\(503/.test(code) &&
     /logRejected\('secret-mismatch'\)\s*return plainText\(401/.test(code) &&
     (code.match(/logRejected\('invalid-json'\)\s*return plainText\(400/g) || []).length === 2)
-  check('success marker remains accepted_sync_disabled',
-    code.includes("{ event: 'netlify_form_webhook', outcome: 'accepted_sync_disabled' }"))
+  check('accepted marker carries only outcome/sync/reason',
+    code.includes("outcome: 'accepted'") && code.includes('sync: result.outcome') &&
+    code.includes('reason: result.reason ?? null'))
+  check('handler returns 204 after the sync step regardless of its result',
+    /processSubmission\(parsed\.body\)[\s\S]*return noContent\(\)\s*\}\s*$/.test(code))
   check('shape marker event is preserved', code.includes("event: 'netlify_form_webhook_shape'"))
   const consoleLines = code.split('\n').filter((l) => l.includes('console.'))
   const unsafeLogTokens = ['request.url', 'request.headers', 'searchParams', 'suppliedSecret',
@@ -158,9 +163,53 @@ console.log('\nStatic source check — no sync path or network call is reachable
   }
   check('body is only logged through the key-only buildShapeRecord',
     consoleLines.filter((l) => l.includes('parsed')).every((l) => l.includes('buildShapeRecord(parsed.body)')))
-  check('code imports only the webhook secret helper from lib/config.js',
-    code.includes("import { loadWebhookSecret } from './lib/config.js'") &&
-    !/from ['"]\.\/lib\/(leadSync|ghlClient|leadMapper)\.js['"]/.test(code))
+  check('code imports config helpers and syncLead only (no direct client/mapper)',
+    code.includes("import { loadWebhookSecret, loadConfig, createLogger } from './lib/config.js'") &&
+    code.includes("import { syncLead } from './lib/leadSync.js'") &&
+    !/from ['"]\.\/lib\/(ghlClient|leadMapper)\.js['"]/.test(code))
+}
+
+console.log('\nextractFormData — locates the form fields defensively:')
+check('body.data object is used', extractFormData({ data: { a: '1' } }).a === '1')
+check('payload.data is the fallback', extractFormData({ payload: { data: { b: '2' } } }).b === '2')
+check('form-name is supplied from top-level form_name',
+  extractFormData({ form_name: 'contact-quote', data: { name: 'x' } })['form-name'] === 'contact-quote')
+check('form_name overrides any in-data form-name',
+  extractFormData({ form_name: 'contact-quote', data: { 'form-name': 'other' } })['form-name'] === 'contact-quote')
+check('no form_name -> no form-name injected',
+  !('form-name' in extractFormData({ data: { name: 'x' } })))
+check('array data ignored', Object.keys(extractFormData({ data: [1] })).length === 0)
+check('missing data -> {}', Object.keys(extractFormData({})).length === 0)
+check('null body -> {}', Object.keys(extractFormData(null)).length === 0)
+
+console.log('\nprocessSubmission — injected fakes only, no config or network:')
+{
+  const calls = []
+  const fakeCfg = () => ({ logLevel: 'info' })
+  const fakeLogger = () => ({})
+  const body = { data: { 'form-name': 'contact-quote', name: 'Synthetic Person' } }
+
+  const ok = await processSubmission(body, {
+    loadConfig: fakeCfg,
+    createLogger: fakeLogger,
+    syncLead: async (data) => { calls.push(data); return { outcome: 'skipped', reason: 'sync-disabled' } },
+  })
+  check('syncLead receives the extracted form fields', calls.length === 1 && calls[0]['form-name'] === 'contact-quote')
+  check('result is passed through as outcome/reason only',
+    ok.outcome === 'skipped' && ok.reason === 'sync-disabled' && Object.keys(ok).length === 2)
+
+  const threw = await processSubmission(body, {
+    loadConfig: fakeCfg,
+    createLogger: fakeLogger,
+    syncLead: async () => { throw new Error('SECRET_LEAK_CHECK') },
+  })
+  check('a throwing sync never propagates', threw.outcome === 'error' && threw.reason === 'sync-threw')
+  check('thrown error text is not returned', !JSON.stringify(threw).includes('SECRET_LEAK_CHECK'))
+
+  const cfgThrew = await processSubmission(body, {
+    loadConfig: () => { throw new Error('boom') },
+  })
+  check('a throwing config load never propagates', cfgThrew.outcome === 'error')
 }
 
 console.log(`\n${passed} passed, ${failed} failed`)
